@@ -27,27 +27,17 @@ void main(void)
   uv -= 0.5;
   uv /= vec2(v2Resolution.y / v2Resolution.x, 1);
 
-  vec2 m;
-  m.x = atan(uv.x / uv.y) / 3.14;
-  m.y = 1 / length(uv) * .2;
-  float d = m.y;
+  vec2 tunnel_transformed_uv;
+  tunnel_transformed_uv.x = atan(uv.x / uv.y) / 3.14;
+  tunnel_transformed_uv.y = 1 / length(uv) * 0.2;
 
-  vec2 _m;
-  _m.x = atan(uv.x / uv.y) / 3.14;
-  _m.y = 1 / length(uv) * .2;
-  //float _d = _m.y;
+  //float f = texture( texChecker, _d ).t;// * 100;
 
-  vec2 _d = vec2(m.x, m.y);
-
-  float f = texture( texChecker, _d ).t;// * 100;
   //m.x += sin( fGlobalTime ) * 0.1;
-  m.y += fGlobalTime * 0.25;
+  tunnel_transformed_uv.y += fGlobalTime * 0.05; //rate at which the thing moves forward
 
-  vec4 t = plas( m * 3.14, fGlobalTime ) / d;
-  vec2 _frag = vec2(m.x, m.y);
-  vec4 _tex_info = texture(texTex3, m);
-  vec4 _t = plas( _m * 3.14, fGlobalTime ) / d;
-  t = clamp( t, 0.0, 1.0 );
-  _t = clamp( _t, 0.0, 1.0 );
-  out_color = _tex_info; // + t; // + f 
+  vec4 _tex_info = texture(texTex3, tunnel_transformed_uv);
+  //vec4 _t = plas( _m * 3.14, fGlobalTime ) / d;
+  //_t = clamp( t, 0.0, 1.0 );
+  out_color = _tex_info; // + _t; // + f 
 }
