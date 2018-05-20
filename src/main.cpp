@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
   changeToAppsCurrentDirectory();
 #endif
 
+  Renderer::Texture *_prev_frame_tex;
+
   jsonxx::Object options;
   FILE * fConf = fopen( (argc > 1) ? argv[1] : "config.json","rb");
   if (fConf)
@@ -93,7 +95,7 @@ int main(int argc, char *argv[])
 
   RENDERER_SETTINGS settings;
   settings.bVsync = false;
-#ifdef _DEBUG
+#ifdef false // _DEBUG
   settings.nWidth = 1280;
   settings.nHeight = 720;
   settings.windowMode = RENDERER_WINDOWMODE_WINDOWED;
@@ -101,6 +103,10 @@ int main(int argc, char *argv[])
   settings.nWidth = 1920;
   settings.nHeight = 1080;
   settings.windowMode = RENDERER_WINDOWMODE_FULLSCREEN;
+
+  settings.nWidth = 1280;
+  settings.nHeight = 720;
+  settings.windowMode = RENDERER_WINDOWMODE_WINDOWED;
   if (options.has<jsonxx::Object>("window"))
   {
     if (options.get<jsonxx::Object>("window").has<jsonxx::Number>("width"))
@@ -119,6 +125,8 @@ int main(int argc, char *argv[])
     printf("Renderer::Open failed\n");
     return -1;
   }
+
+  unsigned char * _buffer = new unsigned char[Renderer::nWidth * Renderer::nWidth * 4];
 
   if (!FFT::Open())
   {
@@ -199,7 +207,16 @@ int main(int argc, char *argv[])
           printf("Renderer::CreateRGBA8TextureFromFile(%s) failed\n",fn);
           return -1;
         }
-        textures.insert( std::make_pair( it->first, tex ) );
+        
+        char ** pointer_b = NULL;
+        char * pointer_display = new char[2];
+        pointer_b = &pointer_display;
+
+        if (it->first == "texPrevFrame")
+        {
+          _prev_frame_tex = tex;
+        }
+        textures.insert(std::make_pair(it->first, tex));
       }
     }
     if (options.has<jsonxx::Object>("font"))
@@ -441,6 +458,34 @@ int main(int argc, char *argv[])
           mDebugOutput.SetText(szError);
         }
       }
+      else if (Renderer::keyEventBuffer[i].scanCode == 291) // F10
+      {
+        ////(Renderer::nHeight - 1)
+        ////unsigned char _buffer[1400 * 800 * sizeof(unsigned int)];
+        //unsigned char _colors[4] = { 0xFF, 0x00, 0x00, 0x00 };
+        //
+        //for (int i = 0; i < Renderer::nWidth * Renderer::nHeight ; ++i)
+        //{
+        //  memcpy(_buffer + (i * 4), _colors, 4);
+        //}
+        //bool _worked = Renderer::GrabFrame(_buffer);
+        //Renderer::GetError();
+        ////mDebugOutput.SetText("\n error? " + Renderer::GetError());
+
+        //Renderer::UpdateRGBA8TextureFromData(_prev_frame_tex, (unsigned char *)_buffer);
+        ////Renderer::Texture * _tex = Renderer::CreateRGBA8TextureFromFile("textures/m5cD9fV_sm.png");
+        ////delete *_prev_frame_tex;
+        ////*_prev_frame_tex = _tex;
+        ////Renderer::UpdateR32Texture(_prev_frame_tex, _buffer);
+        //textures.insert_or_assign("texPrevFrame", _prev_frame_tex);
+        ////mDebugOutput.SetText(Renderer::GetError());
+        Renderer::UpdateRGBA8TextureFromData(_prev_frame_tex, Renderer::nWidth, Renderer::nHeight, (unsigned char *)_buffer);
+        ////delete *_prev_frame_tex;
+        ////*_prev_frame_tex = _tex;
+        ////Renderer::UpdateR32Texture(_prev_frame_tex, _buffer);
+        textures.insert_or_assign("texPrevFrame", _prev_frame_tex);
+        //mDebugOutput.SetText(Renderer::GetError());
+      }
       else if (Renderer::keyEventBuffer[i].scanCode == 292 || (Renderer::keyEventBuffer[i].ctrl && Renderer::keyEventBuffer[i].scanCode == 'f')) // F11 or Ctrl/Cmd-f  
       {
         bShowGui = !bShowGui;
@@ -509,7 +554,25 @@ int main(int argc, char *argv[])
 
     Renderer::RenderFullscreenQuad();
 
+
+    //(Renderer::nHeight - 1)
+    //unsigned char _buffer[1400 * 800 * sizeof(unsigned int)];
+    //unsigned char _colors[4] = { 0xFF, 0x00, 0x00, 0x00 };
+
+    //for (int i = 0; i < Renderer::nWidth * Renderer::nHeight; ++i)
+    //{
+    //  memcpy(_buffer + (i * 4), _colors, 4);
+    //}
+    bool _worked = Renderer::GrabFrame(_buffer);
+    //Renderer::GetError();
+    ////mDebugOutput.SetText("\n error? " + Renderer::GetError());
+
+
     Renderer::StartTextRendering();
+
+    
+
+
 
     if (bShowGui)
     {
@@ -557,6 +620,9 @@ int main(int argc, char *argv[])
 
     Renderer::EndFrame();
 
+    Renderer::UpdateRGBA8TextureFromData(_prev_frame_tex, Renderer::nWidth, Renderer::nHeight, (unsigned char *)_buffer);
+    textures.insert_or_assign("texPrevFrame", _prev_frame_tex);
+
     Capture::CaptureFrame();
 
     if (newShader)
@@ -574,7 +640,7 @@ int main(int argc, char *argv[])
         mDebugOutput.SetText( "Unable to save shader! Your work will be lost when you quit!" );
       }
     }
-  }
+  } //while (!Renderer::WantsToQuit())
 
 
   delete surface;
