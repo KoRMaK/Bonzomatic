@@ -685,6 +685,38 @@ namespace Renderer
     return tex;
   }
 
+  Texture * UpdateRGBA8TextureFromData(Texture * tex, int width, int height, unsigned char * c)
+  {
+    int comp = 0;
+    //int width = 0;
+    //int height = 0;
+    //unsigned char * c = stbi_load( szFilename, (int*)&width, (int*)&height, &comp, STBI_rgb_alpha );
+    if (!c) return NULL;
+
+    glActiveTexture(GL_TEXTURE0 + ((GLTexture*)tex)->unit);
+    glBindTexture(GL_TEXTURE_2D, ((GLTexture*)tex)->ID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    GLenum internalFormat = GL_SRGB8_ALPHA8;
+    GLenum srcFormat = GL_RGBA;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, srcFormat, GL_UNSIGNED_BYTE, c);
+
+    //stbi_image_free(c);
+
+    //GLTexture * _tex = new GLTexture();
+    //tex->width = width;
+    //tex->height = height;
+    //tex->ID = glTexId;
+    //tex->type = TEXTURETYPE_2D;
+    //tex->unit = textureUnit++;
+    return tex;
+  }
+
   Texture * Create1DR32Texture( int w )
   {
     GLuint glTexId = 0;
@@ -747,7 +779,7 @@ namespace Renderer
     glGenTextures(1, &glTexId);
     glBindTexture(GL_TEXTURE_2D, glTexId);
     unsigned int * p32bitData = new unsigned int[ w * h ];
-    for(int i=0; i<w*h; i++) p32bitData[i] = (data[i] << 24) | 0xFFFFFF;
+    for (int i = 0; i < w*h; i++) p32bitData[i] = (data[i] << 24) | 0xFFFFFF;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, p32bitData);
     delete[] p32bitData;
 
@@ -941,6 +973,7 @@ namespace Renderer
     glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[writeIndex]);
     glReadPixels(0, 0, nWidth, nHeight, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo[readIndex]);
+    
     unsigned char * downsampleData = (unsigned char *)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
     if (downsampleData)
     {
@@ -955,8 +988,14 @@ namespace Renderer
       glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
     }
     glBindBuffer(GL_PIXEL_PACK_BUFFER, NULL);
-
+     
     return true;
+  }
+
+  void GetError()
+  {
+    GLenum err = glGetError();
+    printf("[GLFW] error: %#x \n", err);
   }
 
 }

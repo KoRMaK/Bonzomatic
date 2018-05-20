@@ -40,6 +40,7 @@ namespace Renderer
   void EndTextRendering();
 
   bool GrabFrame( void * pPixelBuffer ); // input buffer must be able to hold w * h * 4 bytes of 0xAABBGGRR data
+  void GetError();
 
   void Close();
 
@@ -57,6 +58,7 @@ namespace Renderer
   };
 
   Texture * CreateRGBA8TextureFromFile( char * szFilename );
+  Texture * UpdateRGBA8TextureFromData(Texture * tex, int width, int height, unsigned char * c);
   Texture * CreateA8TextureFromData( int w, int h, unsigned char * data );
   Texture * Create1DR32Texture( int w );
   bool UpdateR32Texture( Texture * tex, float * data );
