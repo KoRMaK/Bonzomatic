@@ -460,31 +460,8 @@ int main(int argc, char *argv[])
       }
       else if (Renderer::keyEventBuffer[i].scanCode == 291) // F10
       {
-        ////(Renderer::nHeight - 1)
-        ////unsigned char _buffer[1400 * 800 * sizeof(unsigned int)];
-        //unsigned char _colors[4] = { 0xFF, 0x00, 0x00, 0x00 };
-        //
-        //for (int i = 0; i < Renderer::nWidth * Renderer::nHeight ; ++i)
-        //{
-        //  memcpy(_buffer + (i * 4), _colors, 4);
-        //}
-        //bool _worked = Renderer::GrabFrame(_buffer);
-        //Renderer::GetError();
-        ////mDebugOutput.SetText("\n error? " + Renderer::GetError());
-
-        //Renderer::UpdateRGBA8TextureFromData(_prev_frame_tex, (unsigned char *)_buffer);
-        ////Renderer::Texture * _tex = Renderer::CreateRGBA8TextureFromFile("textures/m5cD9fV_sm.png");
-        ////delete *_prev_frame_tex;
-        ////*_prev_frame_tex = _tex;
-        ////Renderer::UpdateR32Texture(_prev_frame_tex, _buffer);
-        //textures.insert_or_assign("texPrevFrame", _prev_frame_tex);
-        ////mDebugOutput.SetText(Renderer::GetError());
         Renderer::UpdateRGBA8TextureFromData(_prev_frame_tex, Renderer::nWidth, Renderer::nHeight, (unsigned char *)_buffer);
-        ////delete *_prev_frame_tex;
-        ////*_prev_frame_tex = _tex;
-        ////Renderer::UpdateR32Texture(_prev_frame_tex, _buffer);
         textures.insert_or_assign("texPrevFrame", _prev_frame_tex);
-        //mDebugOutput.SetText(Renderer::GetError());
       }
       else if (Renderer::keyEventBuffer[i].scanCode == 292 || (Renderer::keyEventBuffer[i].ctrl && Renderer::keyEventBuffer[i].scanCode == 'f')) // F11 or Ctrl/Cmd-f  
       {
@@ -563,7 +540,9 @@ int main(int argc, char *argv[])
     //{
     //  memcpy(_buffer + (i * 4), _colors, 4);
     //}
+
     bool _worked = Renderer::GrabFrame(_buffer);
+
     //Renderer::GetError();
     ////mDebugOutput.SetText("\n error? " + Renderer::GetError());
 
