@@ -701,7 +701,7 @@ namespace Renderer
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    GLenum internalFormat = GL_SRGB8_ALPHA8;
+    GLenum internalFormat = GL_RGBA;
     GLenum srcFormat = GL_RGBA;
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, srcFormat, GL_UNSIGNED_BYTE, c);
@@ -709,10 +709,10 @@ namespace Renderer
     //stbi_image_free(c);
 
     //GLTexture * _tex = new GLTexture();
-    //tex->width = width;
-    //tex->height = height;
+    tex->width = width;
+    tex->height = height;
     //tex->ID = glTexId;
-    //tex->type = TEXTURETYPE_2D;
+    tex->type = TEXTURETYPE_2D;
     //tex->unit = textureUnit++;
     return tex;
   }
