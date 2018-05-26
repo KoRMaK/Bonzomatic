@@ -685,7 +685,33 @@ namespace Renderer
     return tex;
   }
 
-  Texture * UpdateRGBA8TextureFromData(Texture * tex, int width, int height, unsigned char * c)
+  Texture * CreateRGBA8TextureFromData(int width, int height, unsigned char * data)
+  {
+
+    GLuint glTexId = 0;
+    glGenTextures(1, &glTexId);
+    glBindTexture(GL_TEXTURE_2D, glTexId);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    GLenum internalFormat = GL_SRGB8_ALPHA8;
+    GLenum srcFormat = GL_RGBA;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, srcFormat, GL_UNSIGNED_BYTE, data);
+
+
+    GLTexture * tex = new GLTexture();
+    tex->width = width;
+    tex->height = height;
+    tex->ID = glTexId;
+    tex->type = TEXTURETYPE_2D;
+    tex->unit = textureUnit++;
+    return tex;
+  }
+  bool UpdateRGBA8TextureFromData(Texture * tex, int width, int height, unsigned char * c)
   {
     int comp = 0;
     //int width = 0;
@@ -714,7 +740,7 @@ namespace Renderer
     //tex->ID = glTexId;
     tex->type = TEXTURETYPE_2D;
     //tex->unit = textureUnit++;
-    return tex;
+    return true;
   }
 
   Texture * Create1DR32Texture( int w )
